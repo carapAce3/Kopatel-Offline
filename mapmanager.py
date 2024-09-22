@@ -4,23 +4,48 @@
 
 class Mapmanager():
     def __init__(self):
-        self.model = 'skull.obj' # завантажуємо модель
-        self.texture = 'skull.jpg'
+        self.model = 'block.egg' # завантажуємо модель
+        self.texture = 'bedrock.png'
         self.block = loader.loadModel(self.model)
         self.block.setTexture(loader.loadTexture(self.texture))
-        self.color = (80, 202, 63, 0.9) # rgba
+        self.color = [(80, 202, 63, 0.9),
+                      (50, 34, 53, 1),
+                      (3, 6, 90, 0.6),
+                      (62, 55, 34, 0.4)] # rgba
         self.start_new()
-        self.add_block((0,10,0))
+        #self.add_block((0,10,0))
     def start_new(self):
         self.map = render.attachNewNode('Map')
+
+    def getColor(self,z):
+        if z < len(self.color):
+            return self.color[z]
+        else:
+            return self.color[len(self.color)-1]
 
 
     def add_block(self, position):
         self.block = loader.loadModel(self.model)
         self.block.setTexture(loader.loadTexture(self.texture))
         self.block.setPos(position)
-        self.block.setColor(self.color)
+        self.c = self.getColor(int(position[2]))  # отримуємо колір залежно від z-координати
+        self.block.setColor(self.c)
         self.block.reparentTo(self.map)
+    def loadMap(self):
+        self.map.removeNode()
+        self.start_new()
+        with open('land.txt', 'r') as file:
+            y = 0
+            for line in file:
+                x = 0
+                line = line.split(' ')
+                for l in line:
+                    for z0 in range(int(l)+1):
+                        block = self.add_block((x,y,z0))
+                    x += 1
+                y += 1
+        return x,y
+
 
 
 
